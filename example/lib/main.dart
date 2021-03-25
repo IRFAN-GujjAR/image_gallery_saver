@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -37,7 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     _requestPermission();
-
   }
 
   @override
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 padding: EdgeInsets.only(top: 15),
-                child: RaisedButton(
+                child: MaterialButton(
                   onPressed: _saveScreen,
                   child: Text("Save Local Image"),
                 ),
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 padding: EdgeInsets.only(top: 15),
-                child: RaisedButton(
+                child: MaterialButton(
                   onPressed: _getHttp,
                   child: Text("Save network image"),
                 ),
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 padding: EdgeInsets.only(top: 15),
-                child: RaisedButton(
+                child: MaterialButton(
                   onPressed: _saveVideo,
                   child: Text("Save network video"),
                 ),
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 padding: EdgeInsets.only(top: 15),
-                child: RaisedButton(
+                child: MaterialButton(
                   onPressed: _saveGif,
                   child: Text("Save Gif to gallery"),
                 ),
@@ -110,11 +110,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _saveScreen() async {
     RenderRepaintBoundary boundary =
-        _globalKey.currentContext.findRenderObject();
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage();
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final byteData = await (image.toByteData(format: ui.ImageByteFormat.png));
+    //  ; // as FutureOr<ByteData>);
+
     final result =
-        await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+        await ImageGallerySaver.saveImage(byteData!.buffer.asUint8List());
     print(result);
     _toastInfo(result.toString());
   }
@@ -156,6 +158,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _toastInfo(String info) {
-    Fluttertoast.showToast(msg: info, toastLength: Toast.LENGTH_LONG);
+    showToast(info, context: context);
   }
 }
